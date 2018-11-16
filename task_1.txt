@@ -1,0 +1,43 @@
+Задание №1
+В базе данных есть следующие таблицы:
+
+CREATE TABLE orders(
+	id INT(10) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	order_number VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE products(
+	id INT(10) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	title VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE orders_products (
+	order_id INT(10) NOT NULL, 
+	product_id INT(10) NOT NULL
+);
+
+
+Напишите следующие SQL-запросы:
+1. вывести список заказов вместе с количеством товаров в данных заказах
+2. вывести все заказы, в которых больше 10 товаров
+3. вывести два любых заказа, у которых максимальное количество общих товаров
+
+Решение:
+1. SELECT o.id, o.order_number, COUNT(op.order_id) as products_count
+   FROM orders o
+   INNER JOIN orders_products op ON o.id = op.order_id
+   GROUP BY o.id
+
+2. SELECT o.id, o.order_number, COUNT(op.order_id) as products_count
+   FROM orders o
+   INNER JOIN orders_products op ON o.id = op.order_id
+   GROUP BY o.id
+   HAVING products_count > 10
+3. SELECT o1.id as order_id_1, o1.order_number as order_number_1, o2.id as order_id_2, o2.order_number as order_number_2, COUNT(*) products_count
+   FROM orders o1
+   INNER JOIN orders_products op1 ON o1.id = op1.order_id
+   INNER JOIN orders_products op2 ON op2.product_id = op1.product_id AND op2.order_id <> op1.order_id
+   INNER JOIN orders o2 ON o2.id = op2.order_id
+   GROUP BY o1.id, o2.id
+   ORDER BY products_count DESC
+   LIMIT 1
